@@ -1,0 +1,32 @@
+version: '2'
+services:
+  https-portal:
+    image: steveltn/https-portal:1
+    ports:
+     - 80:80
+     - 443:443
+    restart: always
+    environment:
+      DOMAINS: "emoji.kindai-slack.info -> http://emoji:3000"
+      STAGE: production
+      CLIENT_MAX_BODY_SIZE": 0
+  emoji:
+    image: ymmtr6/slack-stamp
+    restart: always
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+      - ./configdb:/data/configdb

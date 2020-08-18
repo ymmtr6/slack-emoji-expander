@@ -1,0 +1,27 @@
+{
+  "name": "slack-emoji-stamp",
+  "version": "0.0.1",
+  "description": "Slack no Emoji wo LINE no Stamp view ni suru yatu",
+  "main": "index.js",
+  "scripts": {
+    "local": "node_modules/.bin/nodemon index.js",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "Slack",
+    "Bolt"
+  ],
+  "author": "@seratch",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^2.0.1",
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.9.25",
+    "request": "^2.88.0",
+    "ejs": "^3.1.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
