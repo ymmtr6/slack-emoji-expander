@@ -3,5 +3,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --only=production
 COPY *.js ./
+COPY static ./static
+COPY views ./views
 CMD [ "npm", "start" ]
-
