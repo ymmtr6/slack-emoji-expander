@@ -115,6 +115,14 @@ function generateBlocks(e_list) {
         image_url: emoji_dict[e],
         alt_text: e
       });
+    } else {
+      blocks.push({
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": `:${e}:`
+        }
+      })
     }
   }
   return blocks;
