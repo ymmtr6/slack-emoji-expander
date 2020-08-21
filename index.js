@@ -69,6 +69,21 @@ if (process.env.SLACK_REQUEST_LOG_ENABLED === "1") {
 // Start coding here..
 // see https://slack.dev/bolt/
 
+// event emoji_changed
+app.event("emoji_changed", async ({ logger, event, body }) => {
+  logger.debug(JSON.stringify(event, null, 2));
+  //logger.debug(JSON.stringify(body, null, 2));
+  if (event.type === "emoji_changed" && event.subtype === "add") {
+    emoji_dict[event.name] = event.value
+    logger.debug(`emoji ${event.name} is added.`);
+  } else if (event.type === "emoji_changed" && event.subtype === "removed") {
+    logger.debug(`emoji ${event_name} is removed`);
+  } else (event.type === "emoji_changed"){
+    logger.debug(`emoji reloaded`);
+    getEmojiList()
+  }
+});
+
 app.command("/stamp", async ({ logger, client, ack, body }) => {
   logger.debug(JSON.stringify(body, null, 2));
   const user_id = body.user_id;
