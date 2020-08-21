@@ -78,9 +78,9 @@ app.event("emoji_changed", async ({ logger, event, body }) => {
     logger.debug(`emoji ${event.name} is added.`);
   } else if (event.type === "emoji_changed" && event.subtype === "removed") {
     logger.debug(`emoji ${event_name} is removed`);
-  } else (event.type === "emoji_changed"){
+  } else if (event.type === "emoji_changed") {
     logger.debug(`emoji reloaded`);
-    getEmojiList()
+    getEmojiList();
   }
 });
 
