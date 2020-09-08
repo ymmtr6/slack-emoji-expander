@@ -6,6 +6,9 @@ for (const k in config) {
   process.env[k] = config[k];
 }
 
+// echo-sd
+const execSync = require("child_process").execSync;
+
 const mongoose = require("mongoose");
 const model = require("./model.js");
 
@@ -119,7 +122,57 @@ app.command("/stamp", async ({ logger, client, ack, body }) => {
     logger.debug(JSON.stringify(result, null, 2));
   }
 });
+
+// echo-sd command
+app.command("/echo-sd", async ({ logger, client, ack, body }) => {
+  logger.debug(JSON.stringify(body, null, 2));
+  const user_id = body.user_id;
+  let text = body.text || "";
+  const team_id = body.team_id;
+  const user = await getUser(user_id, team_id);
+  if (!user) {
+    ack("この機能を利用するには、次のリンクからアプリを認可してください。\n"
+      + `<${getAuthURL()}|Click here!>`);
+    return;
+  }
+  try {
+    ack();
+    const emoji_list = text.match(/:.+?:/gui);
+    if (emoji_list) {
+      text = text.replace(/:.+?:/gui, "\u{15FFF}");
+    }
+    let sd = execSync(`echo-sd ${text}`).toString();
+    if (emoji_list) {
+      sd = unicode2emoji(sd, "\u{15FFF}", emoji_list);
+    }
+    logger.debug(sd);
+    const result = await client.chat.postMessage({
+      token: user.access_token,
+      channel: body.channel_id,
+      text: sd,
+      blocks: [
+        {
+          "type": "section",
+          "text": {
+            "type": "plain_text",
+            "text": sd,
+            "emoji": true
+          }
+        }
+      ]
+    });
+  } catch (e) {
+    logger.debug(e);
+  }
+});
 // ---------------------------------------------------------------
+
+function unicode2emoji(text, ucode, emoji_list) {
+  for (const e of emoji_list) {
+    text = text.replace(ucode, e);
+  }
+  return text;
+}
 
 function generateBlocks(e_list) {
   let blocks = [];
