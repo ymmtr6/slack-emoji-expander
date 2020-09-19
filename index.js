@@ -19,6 +19,7 @@ const logLevel = process.env.SLACK_LOG_LEVEL || LogLevel.DEBUG;
 
 const { App, ExpressReceiver } = require("@slack/bolt");
 const { debug } = require("request");
+const fs = require("fs");
 // If you deploy this app to FaaS, turning this on is highly recommended
 // Refer to https://github.com/slackapi/bolt/issues/395 for details
 const processBeforeResponse = false;
@@ -225,8 +226,9 @@ function getEmojiList() {
     },
     (err, res, body) => {
       const b = JSON.parse(body);
-      emoji_dict = b["emoji"];
+      emoji_dict = { ...emoji_dict, ...b["emoji"] };
       console.log("emoji.list read");
+      console.log(JSON.stringify(emoji_dict, null, 2));
     }
   )
 }
@@ -358,8 +360,22 @@ receiver.app.get("/index.html", (_req, res) => {
   res.render("./index.ejs");
 });
 
+function readConfig(filename) {
+  if (fs.existsSync(`./config/${filename}`)) {
+    return JSON.parse(fs.readFileSync(`./config/${filename}`));
+  } else {
+    return {};
+  }
+}
+
+function writeConfig(filename, json_obj) {
+  fs.writeFileSync(`./config/${filename}`, JSON.stringify(json_obj, null, 2));
+}
+
 (async () => {
   await app.start(process.env.PORT || 3000);
   console.log("⚡️ Bolt app is running!");
   getEmojiList();
+  emoji_dict = { ...emoji_dict, ...readConfig("manual.json") };
+  console.log(JSON.stringify(emoji_dict, null, 2));
 })();
